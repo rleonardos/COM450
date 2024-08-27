@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ejercicio TDD</title>
+  </head>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+      border: 1px solid black;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .readonly {
+      background-color: #e0e0e0; /* Or a light gray color */
+    }
+
+    input[type="number"] {
+      width: 80px;
+    }
+
+    #subtotal {
+      text-align: right;
+    }
+  </style>
+  <body>
+    <h1>Ejercicio TDD</h1>
+    <form method="POST" action="{% url 'crear_calificacion' %}">
+      {% csrf_token %}
+      <table>
+        <thead>
+          <tr>
+            <th>CATEGORÍA</th>
+            <th>PARÁMETROS</th>
+            <th>CANTIDAD</th>
+            <th>PUNTAJE</th>
+            <th>MAX.</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td rowspan="5">A. FORMACIÓN ACADÉMICA</td>
+            <td>
+              1. Diplomado: 2 puntos (por cada diplomado adicional se asignará
+              1)
+            </td>
+            <td>
+              <input
+                type="number"
+                id="diplomado"
+                name="diplomado"
+                min="0"
+                oninput="updatePuntaje(this.value, this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="diplomadoPuntaje">0</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>
+              2. Especialidad: 4 puntos (por una especialidad adicional se
+              asignará 2)
+            </td>
+            <td>
+              <input
+                type="number"
+                name="especialidad"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="especialidadPuntaje">0</td>
+            <td>6</td>
+          </tr>
+          <tr>
+            <td>
+              3. Maestría: 8 puntos (por una maestría adicional se asignará 3)
+            </td>
+            <td>
+              <input
+                type="number"
+                name="maestria"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="maestriaPuntaje">0</td>
+            <td>11</td>
+          </tr>
+          <tr>
+            <td>4. Doctorado: 12 puntos</td>
+            <td>
+              <input
+                type="number"
+                name="doctorado"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="doctoradoPuntaje">0</td>
+            <td>12</td>
+          </tr>
+          <tr>
+            <td id="subtotal" colspan="2">Subtotal (hasta 12 puntos)</td>
+            <td class="readonly" id="formacionAcademicaSubtotal">0</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td rowspan="2">B. ACTUALIZACIÓN ACADÉMICA</td>
+            <td>
+              1. Asistencia a programas, cursos, seminarios, talleres y
+              congresos relacionados a area de Derecho: 0.5
+            </td>
+            <td>
+              <input
+                type="number"
+                name="asistencia"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="asistenciaPuntaje">0</td>
+            <td>6</td>
+          </tr>
+          <tr>
+            <td colspan="2" id="subtotal">Subtotal (hasta 6 puntos)</td>
+            <td class="readonly" id="actualizacionAcademicaSubtotal">0</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td rowspan="4">C. EXPERIENCIA PROFESIONAL</td>
+            <td>
+              1. Antigüedad en el ejercicio de la profesión de abogada o
+              abogado: 1 punto por cada año, desde el registro en el RPA
+            </td>
+            <td>
+              <input
+                type="number"
+                name="antiguedad"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="antiguedadPuntaje">0</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>
+              2. Experiencia como servidor público en el Órgano Judicial o
+              Ministerio Público: 1 punto por cada año
+            </td>
+            <td>
+              <input
+                type="number"
+                name="servidorPublico"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="servidorPublicoPuntaje">0</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>
+              3. Como Docente Universitario: 2 puntos por año (pregrado) 2 punto
+              por módulo o asignatura (posgrado)
+            </td>
+            <td>
+              <input
+                type="number"
+                name="docente"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="docentePuntaje">0</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td colspan="2" id="subtotal">Subtotal (hasta 10 puntos)</td>
+            <td class="readonly" id="experienciaProfesionalSubtotal">0</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td rowspan="2">D. PRODUCCIÓN INTELECTUAL</td>
+            <td>
+              1. Artículos publicados vinculados al área jurídical (1 punto por
+              cada artículo, máx. 2 artículos)
+            </td>
+            <td>
+              <input
+                type="number"
+                name="articulos"
+                min="0"
+                oninput="updatePuntaje(this.value,this.name)"
+                value="0"
+              />
+            </td>
+            <td class="readonly" id="articulosPuntaje">0</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td colspan="2" id="subtotal">Subtotal (hasta 2 puntos)</td>
+            <td class="readonly" id="produccionIntelectualSubtotal">0</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="3" id="subtotal">TOTAL</td>
+            <td class="readonly" id="totalPuntaje">0</td>
+            <td>30</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        Nota.- La autenticidad de la documentación presentada podrá ser
+        verificada por la Escuela de Jueces del Estado cuando lo considere
+        necesario.
+      </p>
+      <p>Observaciones:</p>
+      <textarea
+        type="input"
+        name="observacion"
+        style="width: 40%; height: 100px"
+      ></textarea>
+
+      <button type="submit">Guardar</button>
+      <button type="button" onclick="imprimir()">Imprimir</button>
+      <button type="button"><a href="/">Cerrar</a></button>
+    </form>
+
+    <script>
+      sumatoriaA=0;
+      sumatoriaB=0;
+      sumatoriaC=0;
+      sumatoriaD=0;
+    //   alert(sumatoria)
+      function imprimir() {
+        window.print();
+      }
+      function updatePuntaje(value, inputName) {
+        const formData = new FormData();
+        formData.append(inputName, value);
+        fetch("{% url 'calculate_puntaje' %}", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById(inputName + "Puntaje").innerText =
+              data.puntaje;
+                //alert(data.puntaje);
+            sumatoriaA=parseInt(document.getElementById("diplomadoPuntaje").innerText)+
+            parseInt(document.getElementById("especialidadPuntaje").innerText)+
+            parseInt(document.getElementById("maestriaPuntaje").innerText)+
+            parseInt(document.getElementById("doctoradoPuntaje").innerText);
+            if(sumatoriaA>12)
+                sumatoriaA=12;
+            document.getElementById("formacionAcademicaSubtotal").innerText = sumatoriaA;
+
+            sumatoriaB=parseFloat(document.getElementById("asistenciaPuntaje").innerText);
+            document.getElementById("actualizacionAcademicaSubtotal").innerText = sumatoriaB;
+
+            sumatoriaC=parseInt(document.getElementById("antiguedadPuntaje").innerText)+
+            parseInt(document.getElementById("servidorPublicoPuntaje").innerText)+
+            parseInt(document.getElementById("docentePuntaje").innerText);
+            document.getElementById("experienciaProfesionalSubtotal").innerText = sumatoriaC;
+
+            sumatoriaD=parseFloat(document.getElementById("articulosPuntaje").innerText);
+            document.getElementById("produccionIntelectualSubtotal").innerText = sumatoriaD;
+
+            document.getElementById("totalPuntaje").innerText = sumatoriaA+sumatoriaB+sumatoriaC+sumatoriaD;
+          })
+          .catch((error) => console.error(error));
+      }
+    </script>
+  </body>
+</html>
