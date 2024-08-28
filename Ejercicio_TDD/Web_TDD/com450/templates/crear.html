@@ -42,7 +42,7 @@
   </style>
   <body>
     <h1>Ejercicio TDD</h1>
-    <form method="POST" action="{% url 'crear_calificacion' %}">
+    <form id="myForm" method="POST" action="{% url 'crear_calificacion' %}">
       {% csrf_token %}
       <table>
         <thead>
@@ -255,7 +255,7 @@
       <button type="button"><a href="/">Cerrar</a></button>
     </form>
 
-    <script>
+    <!-- <script>
       sumatoriaA=0;
       sumatoriaB=0;
       sumatoriaC=0;
@@ -298,6 +298,68 @@
             document.getElementById("totalPuntaje").innerText = sumatoriaA+sumatoriaB+sumatoriaC+sumatoriaD;
           })
           .catch((error) => console.error(error));
+      }
+    </script> -->
+
+    <script>
+      sumatoriaA=0;
+      sumatoriaB=0;
+      sumatoriaC=0;
+      sumatoriaD=0;
+      function updatePuntaje(value, name) {
+        // Actualiza el puntaje en el formulario
+        // ... (tu lógica actual)
+
+        // Recoge todos los datos del formulario
+        const formData = new FormData(document.getElementById("myForm"));
+
+        // Enviar los datos al servidor usando Fetch API
+        fetch('{% url "calculate_puntaje" %}', {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-CSRFToken": document.querySelector(
+              '[name="csrfmiddlewaretoken"]'
+            ).value,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            document.getElementById('diplomadoPuntaje').textContent = data.diplomadoPuntaje || 0;
+            document.getElementById('especialidadPuntaje').textContent = data.especialidadPuntaje || 0;
+            document.getElementById('maestriaPuntaje').textContent = data.maestriaPuntaje || 0;
+            document.getElementById('doctoradoPuntaje').textContent = data.doctoradoPuntaje || 0;
+            
+            sumatoriaA=parseInt(document.getElementById("diplomadoPuntaje").innerText)+
+            parseInt(document.getElementById("especialidadPuntaje").innerText)+
+            parseInt(document.getElementById("maestriaPuntaje").innerText)+
+            parseInt(document.getElementById("doctoradoPuntaje").innerText);
+            if(sumatoriaA>12)
+                sumatoriaA=12;
+            document.getElementById("formacionAcademicaSubtotal").innerText = sumatoriaA;
+
+            document.getElementById('asistenciaPuntaje').textContent = data.asistenciaPuntaje || 0;
+            sumatoriaB=parseFloat(document.getElementById("asistenciaPuntaje").innerText);
+            document.getElementById("actualizacionAcademicaSubtotal").innerText = sumatoriaB;
+
+            document.getElementById('antiguedadPuntaje').textContent = data.antiguedadPuntaje || 0;
+            document.getElementById('servidorPublicoPuntaje').textContent = data.servidorPublicoPuntaje || 0;
+            document.getElementById('docentePuntaje').textContent = data.docentePuntaje || 0;
+            sumatoriaC=parseInt(document.getElementById("antiguedadPuntaje").innerText)+
+            parseInt(document.getElementById("servidorPublicoPuntaje").innerText)+
+            parseInt(document.getElementById("docentePuntaje").innerText);
+            document.getElementById("experienciaProfesionalSubtotal").innerText = sumatoriaC;
+
+            document.getElementById('articulosPuntaje').textContent = data.articulosPuntaje || 0;
+            sumatoriaD=parseFloat(document.getElementById("articulosPuntaje").innerText);
+            document.getElementById("produccionIntelectualSubtotal").innerText = sumatoriaD;
+
+            document.getElementById("totalPuntaje").innerText = sumatoriaA+sumatoriaB+sumatoriaC+sumatoriaD;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     </script>
   </body>
