@@ -91,9 +91,13 @@ def calcular_D(publicacion):
     return puntaje
 ###########################################################################################
 def prueba_calcular_A(diplomados, especialidades, maestrias, doctorados):
-    resultados = np.array([diplomados, especialidades, maestrias, doctorados])
-    print(resultados)
-    if np.array_equal(resultados, [0, 0, 0, 12]):
+    datos = np.array([diplomados, especialidades, maestrias, doctorados])
+    resultados = np.array([0, 0, 0, 12])
+    print(datos)
+    
+    assert np.array_equal(datos, resultados), f"Los arrays no son iguales: {datos} != {resultados}"
+    
+    if np.array_equal(datos, resultados):
         return print("El test de prueba fue correcto.")
     else:
         return print("El test de prueba fue incorrecto")
